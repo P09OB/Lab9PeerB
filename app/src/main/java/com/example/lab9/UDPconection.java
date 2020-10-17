@@ -13,6 +13,12 @@ public class UDPconection extends Thread {
 
 
     private DatagramSocket socket;
+    private onMessageListener observer;
+
+    public void setObserver(onMessageListener obs) {
+        this.observer = obs;
+
+    }
 
     public void run() {
 
@@ -26,12 +32,14 @@ public class UDPconection extends Thread {
 
             while(true) {
 
-                byte[] buffer = new byte [100];
+                byte[] buffer = new byte [500];
                 DatagramPacket packet = new DatagramPacket(buffer,buffer.length);
                 Log.e("udp","Esperando Datagrama....");
                 socket.receive(packet);
                 String mensaje = new String(packet.getData()).trim();
                 Log.e("udp","Mensaje recibido...."+mensaje);
+                observer.message(mensaje);
+
 
             }
 

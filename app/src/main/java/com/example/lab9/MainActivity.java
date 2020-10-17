@@ -2,10 +2,13 @@ package com.example.lab9;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.lab9.model.Coffe;
 import com.example.lab9.model.Muffin;
@@ -19,13 +22,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, onMessageListener{
 
 
     private ImageView muffin,smoothie,coffe,sandwich;
-    String ip;
+    String ip = " ";
     UDPconection udp;
-    Muffin product1;
+    private Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,28 +45,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         coffe.setOnClickListener(this);
         sandwich.setOnClickListener(this);
 
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
 
         udp = new UDPconection();
+        udp.setObserver(this);
         udp.start();
 
-        new Thread(
 
-                ()->{
-
-                    try {
-                        InetAddress direccion = InetAddress.getLocalHost();
-                        ip = direccion.getHostAddress();
-
-                        Log.e("ip","es:"+""+ip);
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }
-
-
-        ).start();
 
 
 
@@ -71,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+
+
 
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
@@ -116,8 +107,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
 
+    }
+
+    @Override
+    public void message(String msg) {
+
+        long tiempo = 500;
+        vibrator.vibrate(tiempo);
 
 
+        runOnUiThread(
+
+                ()->{
+                    Toast.makeText(this,"Pedido listo",Toast.LENGTH_LONG).show();
+                }
+        );
 
 
 
